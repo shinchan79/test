@@ -2,7 +2,10 @@ data "archive_file" "lambda" {
   for_each = var.create_lambda && var.create ? var.lambda_functions : {}
 
   type        = "zip"
-  source_file = format("${path.module}/../.%s/%s.py", each.value.source_dir, coalesce(each.value.source_file, each.value.name, each.key))
+  source_file = format("${path.module}/%s/%s.py", 
+    each.value.source_dir,
+    each.value.handler != null ? split(".", each.value.handler)[0] : each.value.name
+  )
   output_path = "${path.module}/archive_file/${coalesce(each.value.source_file, each.value.name, each.key)}.zip"
 }
 
