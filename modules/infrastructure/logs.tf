@@ -5,5 +5,8 @@ resource "aws_cloudwatch_log_group" "lambda" {
   retention_in_days = each.value.logging_config.retention_in_days
   kms_key_id        = each.value.logging_config.kms_key_id
 
-  tags = var.additional_tags
+  tags = merge(
+    var.additional_tags,
+    each.value.logging_config. log_group_tags
+  )
 }

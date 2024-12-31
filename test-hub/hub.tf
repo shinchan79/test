@@ -114,7 +114,7 @@ module "hub" {
         log_format        = "Text"
         retention_in_days = 7
       }
-      source_dir = "../../lambda_sources/helper"
+      source_dir = "${path.module}/../lambda_sources/helper"
       role_arn   = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/QM-Helper-Function-Role"
     }
     deployment_manager = {
@@ -149,7 +149,7 @@ module "hub" {
         log_format        = "Text"
         retention_in_days = 7
       }
-      source_dir = "../../lambda_sources/deployment-manager"
+      source_dir = "${path.module}/../lambda_sources/deployment-manager"
       role_arn   = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/QM-Deployment-Manager-Function-Role"
     }
   }

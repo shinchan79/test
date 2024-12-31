@@ -2,6 +2,20 @@ data "aws_partition" "current" {}
 data "aws_region" "current" {}
 data "aws_caller_identity" "current" {}
 
+data "archive_file" "lambda" {
+  for_each = {
+    for k, v in var.lambda_functions : k => v
+    if var.create_lambda && var.create && v.source_dir != null && v.s3_bucket == null
+  }
+
+  type = "zip"
+  source_file = format("${path.module}/%s/%s.py",
+    each.value.source_dir,
+    each.value.handler != null ? split(".", each.value.handler)[0] : each.value.name
+  )
+  output_path = "${path.module}/archive_file/${coalesce(each.value.source_file, each.value.name, each.key)}.zip"
+}
+
 data "aws_iam_policy_document" "sqs_policy" {
   for_each = { for k, v in var.sqs_queue : k => v if v.policy == null && var.create_sqs && var.create }
 

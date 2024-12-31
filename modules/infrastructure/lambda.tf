@@ -1,17 +1,3 @@
-data "archive_file" "lambda" {
-  for_each = {
-    for k, v in var.lambda_functions : k => v
-    if var.create_lambda && var.create && v.source_dir != null && v.s3_bucket == null
-  }
-
-  type = "zip"
-  source_file = format("${path.module}/%s/%s.py",
-    each.value.source_dir,
-    each.value.handler != null ? split(".", each.value.handler)[0] : each.value.name
-  )
-  output_path = "${path.module}/archive_file/${coalesce(each.value.source_file, each.value.name, each.key)}.zip"
-}
-
 resource "aws_lambda_function" "lambda" {
   for_each = var.create_lambda && var.create ? var.lambda_functions : {}
 

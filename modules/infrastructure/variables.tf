@@ -282,6 +282,7 @@ variable "lambda_functions" {
       system_log_level      = optional(string, "WARN")
       retention_in_days     = optional(number, 14)
       kms_key_id            = optional(number, 14)
+      log_group_tags        = optional(map(string))
     })
     tags = optional(map(string))
   }))
