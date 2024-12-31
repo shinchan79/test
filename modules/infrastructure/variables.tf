@@ -228,6 +228,34 @@ variable "create_lambda" {
   }
 }
 
+# variable "lambda_functions" {
+#   description = "Map of Lambda function configurations."
+#   type = map(object({
+#     name                  = optional(string)
+#     runtime               = optional(string, "python3.12")
+#     timeout               = optional(number, 30)
+#     memory_size           = optional(string, 128)
+#     architectures         = optional(list(string), ["x86_64"])
+#     role_arn              = optional(string)
+#     role_key              = optional(string)
+#     source_file           = optional(string)
+#     source_dir            = string
+#     handler               = optional(string, "lambda_handler")
+#     kms_key_arn           = optional(string)
+#     environment_variables = optional(map(string))
+#     security_group_ids    = optional(list(string))
+#     subnet_ids            = optional(list(string))
+#     logging_config = object({
+#       application_log_level = optional(string)
+#       log_format            = optional(string, "JSON")
+#       log_group             = optional(string)
+#       system_log_level      = optional(string, "WARN")
+#     })
+#     tags = optional(map(string))
+#   }))
+#   default = {}
+# }
+
 variable "lambda_functions" {
   description = "Map of Lambda function configurations."
   type = map(object({
@@ -239,7 +267,9 @@ variable "lambda_functions" {
     role_arn              = optional(string)
     role_key              = optional(string)
     source_file           = optional(string)
-    source_dir            = string
+    source_dir            = optional(string)    # Make this optional
+    s3_bucket            = optional(string)     # Add S3 bucket
+    s3_key               = optional(string)     # Add S3 key
     handler               = optional(string, "lambda_handler")
     kms_key_arn           = optional(string)
     environment_variables = optional(map(string))
@@ -247,9 +277,10 @@ variable "lambda_functions" {
     subnet_ids            = optional(list(string))
     logging_config = object({
       application_log_level = optional(string)
-      log_format            = optional(string, "JSON")
-      log_group             = optional(string)
-      system_log_level      = optional(string, "WARN")
+      log_format           = optional(string, "JSON")
+      log_group            = optional(string)
+      system_log_level     = optional(string, "WARN")
+      retention_in_days    = optional(number, 14)
     })
     tags = optional(map(string))
   }))
