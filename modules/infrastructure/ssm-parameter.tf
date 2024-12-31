@@ -5,10 +5,10 @@ resource "aws_ssm_parameter" "parameters" {
   description = each.value.description
   type        = each.value.type
   value       = each.value.value
-  
+
   allowed_pattern = each.value.allowed_pattern
-  data_type      = each.value.data_type
-  key_id         = each.value.key_id
-  tier           = each.value.tier
-  tags           = merge(var.additional_tags, each.value.tags)
+  data_type       = each.value.data_type
+  key_id          = each.value.key_id
+  tier            = each.value.tier
+  tags            = merge(var.additional_tags, each.value.tags)
 }

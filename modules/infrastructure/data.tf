@@ -8,7 +8,7 @@ data "aws_iam_policy_document" "sqs_policy" {
   statement {
     effect = "Allow"
     principals {
-      type = "Service"
+      type        = "Service"
       identifiers = ["events.amazonaws.com"]
     }
     actions = [
@@ -20,7 +20,7 @@ data "aws_iam_policy_document" "sqs_policy" {
     condition {
       test     = "ArnLike"
       variable = "aws:SourceArn"
-      values   = [
+      values = [
         "arn:${data.aws_partition.current.partition}:events:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rule/*"
       ]
     }

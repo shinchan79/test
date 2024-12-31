@@ -3,6 +3,7 @@ resource "aws_cloudwatch_log_group" "lambda" {
 
   name              = "/aws/lambda/${each.value.name}"
   retention_in_days = each.value.logging_config.retention_in_days
+  kms_key_id        = each.value.logging_config.kms_key_id
 
   tags = var.additional_tags
 }

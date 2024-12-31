@@ -41,11 +41,11 @@ variable "app_registry_attribute_group" {
   default = {
     name        = "quota-monitor-attributes"
     description = "Quota Monitor Attributes"
-    attributes  = {
+    attributes = {
       version     = "1.0.0"
       environment = "production"
     }
-    tags        = {}
+    tags = {}
   }
 }
 
@@ -267,9 +267,9 @@ variable "lambda_functions" {
     role_arn              = optional(string)
     role_key              = optional(string)
     source_file           = optional(string)
-    source_dir            = optional(string)    # Make this optional
-    s3_bucket            = optional(string)     # Add S3 bucket
-    s3_key               = optional(string)     # Add S3 key
+    source_dir            = optional(string) # Make this optional
+    s3_bucket             = optional(string) # Add S3 bucket
+    s3_key                = optional(string) # Add S3 key
     handler               = optional(string, "lambda_handler")
     kms_key_arn           = optional(string)
     environment_variables = optional(map(string))
@@ -277,10 +277,11 @@ variable "lambda_functions" {
     subnet_ids            = optional(list(string))
     logging_config = object({
       application_log_level = optional(string)
-      log_format           = optional(string, "JSON")
-      log_group            = optional(string)
-      system_log_level     = optional(string, "WARN")
-      retention_in_days    = optional(number, 14)
+      log_format            = optional(string, "JSON")
+      log_group             = optional(string)
+      system_log_level      = optional(string, "WARN")
+      retention_in_days     = optional(number, 14)
+      kms_key_id            = optional(number, 14)
     })
     tags = optional(map(string))
   }))
@@ -363,10 +364,10 @@ variable "ssm_parameters" {
     type            = string
     value           = string
     allowed_pattern = optional(string)
-    data_type      = optional(string)
-    key_id         = optional(string)
-    tier           = optional(string)
-    tags           = optional(map(string), {})
+    data_type       = optional(string)
+    key_id          = optional(string)
+    tier            = optional(string)
+    tags            = optional(map(string), {})
   }))
   default = {}
 

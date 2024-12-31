@@ -164,8 +164,8 @@ locals {
       description         = try(v.description, null)
       compatible_runtimes = try(v.compatible_runtimes, null)
       filename            = try(v.filename, null)
-      s3_bucket          = try(v.filename.s3_bucket, null)
-      s3_key             = try(v.filename.s3_key, null)
+      s3_bucket           = try(v.filename.s3_bucket, null)
+      s3_key              = try(v.filename.s3_key, null)
     } if var.create && var.create_lambda_layer
   }
 }

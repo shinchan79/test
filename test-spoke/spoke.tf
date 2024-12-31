@@ -2,7 +2,7 @@ module "spoke" {
   source = "../modules/infrastructure"
 
   # Common
-  create = true
+  create        = true
   master_prefix = "QuotaMonitor"
 
   # Event Buses
@@ -14,12 +14,12 @@ module "spoke" {
         Version = "2012-10-17"
         Statement = [
           {
-            Sid = "allowed_accounts"
+            Sid    = "allowed_accounts"
             Effect = "Allow"
             Principal = {
               AWS = ["arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:root"]
             }
-            Action = ["events:PutEvents"]
+            Action   = ["events:PutEvents"]
             Resource = "*"
           }
         ]
@@ -31,12 +31,12 @@ module "spoke" {
         Version = "2012-10-17"
         Statement = [
           {
-            Sid = "allowed_accounts"
+            Sid    = "allowed_accounts"
             Effect = "Allow"
             Principal = {
               AWS = ["arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:root"]
             }
-            Action = ["events:PutEvents"]
+            Action   = ["events:PutEvents"]
             Resource = "*"
           }
         ]
@@ -47,7 +47,7 @@ module "spoke" {
   # Event Rules
   event_rules = {
     ta_ok = {
-      name = "QuotaMonitor-TAOkRule"
+      name        = "QuotaMonitor-TAOkRule"
       description = "SO0005 quota-monitor-for-aws - Rule for TA OK events"
       event_pattern = jsonencode({
         account = [data.aws_caller_identity.current.account_id]
@@ -58,11 +58,11 @@ module "spoke" {
           }
         }
         detail-type = ["Trusted Advisor Check Item Refresh Notification"]
-        source = ["aws.trustedadvisor"]
+        source      = ["aws.trustedadvisor"]
       })
     }
     ta_warn = {
-      name = "QuotaMonitor-TAWarnRule"
+      name        = "QuotaMonitor-TAWarnRule"
       description = "SO0005 quota-monitor-for-aws - Rule for TA WARN events"
       event_pattern = jsonencode({
         account = [data.aws_caller_identity.current.account_id]
@@ -73,11 +73,11 @@ module "spoke" {
           }
         }
         detail-type = ["Trusted Advisor Check Item Refresh Notification"]
-        source = ["aws.trustedadvisor"]
+        source      = ["aws.trustedadvisor"]
       })
     }
     ta_error = {
-      name = "QuotaMonitor-TAErrorRule"
+      name        = "QuotaMonitor-TAErrorRule"
       description = "SO0005 quota-monitor-for-aws - Rule for TA ERROR events"
       event_pattern = jsonencode({
         account = [data.aws_caller_identity.current.account_id]
@@ -88,11 +88,11 @@ module "spoke" {
           }
         }
         detail-type = ["Trusted Advisor Check Item Refresh Notification"]
-        source = ["aws.trustedadvisor"]
+        source      = ["aws.trustedadvisor"]
       })
     }
     sns_publisher = {
-      name = "QuotaMonitor-SNSPublisherRule"
+      name        = "QuotaMonitor-SNSPublisherRule"
       description = "SO0005 quota-monitor-for-aws - Rule for SNS Publisher"
       event_pattern = jsonencode({
         detail = {
@@ -113,22 +113,22 @@ module "spoke" {
   # Event Targets
   event_targets = {
     ta_ok = {
-      rule = "QuotaMonitor-TAOkRule"
+      rule       = "QuotaMonitor-TAOkRule"
       target_arn = var.event_bus_arn
-      role_arn = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/TAOkRuleEventsRole"
+      role_arn   = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/TAOkRuleEventsRole"
     }
     ta_warn = {
-      rule = "QuotaMonitor-TAWarnRule" 
+      rule       = "QuotaMonitor-TAWarnRule"
       target_arn = var.event_bus_arn
-      role_arn = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/TAWarnRuleEventsRole"
+      role_arn   = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/TAWarnRuleEventsRole"
     }
     ta_error = {
-      rule = "QuotaMonitor-TAErrorRule"
+      rule       = "QuotaMonitor-TAErrorRule"
       target_arn = var.event_bus_arn
-      role_arn = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/TAErrorRuleEventsRole"
+      role_arn   = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/TAErrorRuleEventsRole"
     }
     sns_publisher = {
-      rule = "QuotaMonitor-SNSPublisherRule"
+      rule       = "QuotaMonitor-SNSPublisherRule"
       target_arn = "arn:${data.aws_partition.current.partition}:lambda:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:function:QuotaMonitor-SNSPublisher"
     }
   }
@@ -136,12 +136,12 @@ module "spoke" {
   # Event Schedules
   event_schedules = {
     ta_refresher = {
-      name = "QuotaMonitor-TARefresher"
-      schedule_expression = var.ta_refresh_rate
+      name                 = "QuotaMonitor-TARefresher"
+      schedule_expression  = var.ta_refresh_rate
       flexible_time_window = "OFF"
-      role_arn = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/TARefresherRole"
+      role_arn             = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/TARefresherRole"
       input = jsonencode({
-        source = "aws.quotamonitor"
+        source      = "aws.quotamonitor"
         detail-type = "Quota Monitor TA Refresh"
         detail = {
           action = "refresh"
@@ -154,30 +154,30 @@ module "spoke" {
   create_lambda_layer = true
   lambda_layers = {
     utils_sns = {
-      name = "QM-UtilsLayer-quota-monitor-sns-spoke"
-      description = "Utilities layer for Quota Monitor SNS"
+      name                = "QM-UtilsLayer-quota-monitor-sns-spoke"
+      description         = "Utilities layer for Quota Monitor SNS"
       compatible_runtimes = ["nodejs18.x"]
       filename = {
         s3_bucket = "solutions-${data.aws_region.current.name}"
-        s3_key = "quota-monitor-for-aws/v6.3.0/assete8b91b89616aa81e100a9f9ce53981ad5df4ba7439cebca83d5dc68349ed3703.zip"
+        s3_key    = "quota-monitor-for-aws/v6.3.0/assete8b91b89616aa81e100a9f9ce53981ad5df4ba7439cebca83d5dc68349ed3703.zip"
       }
     }
     utils_sq = {
-      name = "QM-UtilsLayer-quota-monitor-sq-spoke"
-      description = "Utilities layer for Quota Monitor SQ"
+      name                = "QM-UtilsLayer-quota-monitor-sq-spoke"
+      description         = "Utilities layer for Quota Monitor SQ"
       compatible_runtimes = ["nodejs18.x"]
       filename = {
         s3_bucket = "solutions-${data.aws_region.current.name}"
-        s3_key = "quota-monitor-for-aws/v6.3.0/assete8b91b89616aa81e100a9f9ce53981ad5df4ba7439cebca83d5dc68349ed3703.zip"
+        s3_key    = "quota-monitor-for-aws/v6.3.0/assete8b91b89616aa81e100a9f9ce53981ad5df4ba7439cebca83d5dc68349ed3703.zip"
       }
     }
     utils_ta = {
-      name = "QM-UtilsLayer"
-      description = "Utilities layer for Quota Monitor TA"
+      name                = "QM-UtilsLayer"
+      description         = "Utilities layer for Quota Monitor TA"
       compatible_runtimes = ["nodejs18.x"]
       filename = {
         s3_bucket = "solutions-${data.aws_region.current.name}"
-        s3_key = "quota-monitor-for-aws/v6.3.0/assete8b91b89616aa81e100a9f9ce53981ad5df4ba7439cebca83d5dc68349ed3703.zip"
+        s3_key    = "quota-monitor-for-aws/v6.3.0/assete8b91b89616aa81e100a9f9ce53981ad5df4ba7439cebca83d5dc68349ed3703.zip"
       }
     }
   }
@@ -186,7 +186,7 @@ module "spoke" {
   create_dynamodb = true
   dynamodb_tables = {
     service_table = {
-      name = "SQ-ServiceTable"
+      name     = "SQ-ServiceTable"
       hash_key = "ServiceCode"
       attributes = [
         {
@@ -194,15 +194,15 @@ module "spoke" {
           type = "S"
         }
       ]
-      stream_enabled = true
+      stream_enabled   = true
       stream_view_type = "NEW_AND_OLD_IMAGES"
       server_side_encryption = {
         enabled = true
       }
     }
     quota_table = {
-      name = "SQ-QuotaTable"
-      hash_key = "ServiceCode"
+      name      = "SQ-QuotaTable"
+      hash_key  = "ServiceCode"
       range_key = "QuotaCode"
       attributes = [
         {
@@ -224,11 +224,11 @@ module "spoke" {
   create_ssm_parameter = true
   ssm_parameters = {
     notification_muting = {
-      name = "/QuotaMonitor/spoke/NotificationConfiguration"
+      name        = "/QuotaMonitor/spoke/NotificationConfiguration"
       description = "Muting configuration for services, limits"
-      type = "StringList"
-      value = "NOP"
-      tier = "Standard"
+      type        = "StringList"
+      value       = "NOP"
+      tier        = "Standard"
     }
   }
 
@@ -236,7 +236,7 @@ module "spoke" {
   create_sns = true
   sns_topic = {
     publisher = {
-      name = "QuotaMonitor-SNSPublisher"
+      name              = "QuotaMonitor-SNSPublisher"
       kms_master_key_id = "alias/aws/sns"
     }
   }
@@ -245,19 +245,19 @@ module "spoke" {
   create_sqs = true
   sqs_queue = {
     sns_publisher_dlq = {
-      name = "QuotaMonitor-SNSPublisher-DLQ"
+      name              = "QuotaMonitor-SNSPublisher-DLQ"
       kms_master_key_id = "alias/aws/sqs"
       policy = jsonencode({
         Version = "2012-10-17"
         Statement = [
           {
-            Effect = "Deny"
+            Effect    = "Deny"
             Principal = "*"
-            Action = "sqs:*"
-            Resource = "*"
+            Action    = "sqs:*"
+            Resource  = "*"
             Condition = {
               Bool = {
-                "aws:SecureTransport": "false"
+                "aws:SecureTransport" : "false"
               }
             }
           }
@@ -265,19 +265,19 @@ module "spoke" {
       })
     }
     ta_refresher_dlq = {
-      name = "QuotaMonitor-TARefresher-DLQ"
+      name              = "QuotaMonitor-TARefresher-DLQ"
       kms_master_key_id = "alias/aws/sqs"
       policy = jsonencode({
         Version = "2012-10-17"
         Statement = [
           {
-            Effect = "Deny"
+            Effect    = "Deny"
             Principal = "*"
-            Action = "sqs:*"
-            Resource = "*"
+            Action    = "sqs:*"
+            Resource  = "*"
             Condition = {
               Bool = {
-                "aws:SecureTransport": "false"
+                "aws:SecureTransport" : "false"
               }
             }
           }
@@ -285,19 +285,19 @@ module "spoke" {
       })
     }
     list_manager_dlq = {
-      name = "QuotaMonitor-ListManager-DLQ"
+      name              = "QuotaMonitor-ListManager-DLQ"
       kms_master_key_id = "alias/aws/sqs"
       policy = jsonencode({
         Version = "2012-10-17"
         Statement = [
           {
-            Effect = "Deny"
+            Effect    = "Deny"
             Principal = "*"
-            Action = "sqs:*"
-            Resource = "*"
+            Action    = "sqs:*"
+            Resource  = "*"
             Condition = {
               Bool = {
-                "aws:SecureTransport": "false"
+                "aws:SecureTransport" : "false"
               }
             }
           }
@@ -334,7 +334,7 @@ module "spoke" {
   #       retention_in_days = 7
   #     }
   #   }
-    
+
   #   list_manager = {
   #     name = "QuotaMonitor-ListManager"
   #     description = "SO0005 quota-monitor-for-aws - List Manager Function"
@@ -358,7 +358,7 @@ module "spoke" {
   #       retention_in_days = 7
   #     }
   #   }
-    
+
   #   ta_refresher = {
   #     name = "QuotaMonitor-TARefresher"
   #     description = "SO0005 quota-monitor-for-aws - TA Refresher Function"
@@ -384,84 +384,84 @@ module "spoke" {
   #     }
   #   }
   # }
-    # Lambda Functions
+  # Lambda Functions
   create_lambda = true
   lambda_functions = {
     sns_publisher = {
-      name = "QuotaMonitor-SNSPublisher"
+      name        = "QuotaMonitor-SNSPublisher"
       description = "SO0005 quota-monitor-for-aws - SNS Publisher Function"
-      handler = "index.handler"
-      runtime = "nodejs18.x"
-      timeout = 60
+      handler     = "index.handler"
+      runtime     = "nodejs18.x"
+      timeout     = 60
       memory_size = 128
-      layers = ["utils_sns"]
-      s3_bucket = "solutions-${data.aws_region.current.name}"
-      s3_key = "quota-monitor-for-aws/v6.3.0/assete7a324e67e467d0c22e13b0693ca4efdceb0d53025c7fb45fe524870a5c18046.zip"
+      layers      = ["utils_sns"]
+      s3_bucket   = "solutions-${data.aws_region.current.name}"
+      s3_key      = "quota-monitor-for-aws/v6.3.0/assete7a324e67e467d0c22e13b0693ca4efdceb0d53025c7fb45fe524870a5c18046.zip"
       environment_variables = {
-        LOG_LEVEL = "info"
+        LOG_LEVEL                               = "info"
         QM_NOTIFICATION_MUTING_CONFIG_PARAMETER = "/QuotaMonitor/spoke/NotificationConfiguration"
-        SEND_METRIC = "No"
-        TOPIC_ARN = "arn:${data.aws_partition.current.partition}:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:QuotaMonitor-SNSPublisher"
-        CUSTOM_SDK_USER_AGENT = "AwsSolution/SO0005/v6.3.0"
-        VERSION = "v6.3.0"
-        SOLUTION_ID = "SO0005"
+        SEND_METRIC                             = "No"
+        TOPIC_ARN                               = "arn:${data.aws_partition.current.partition}:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:QuotaMonitor-SNSPublisher"
+        CUSTOM_SDK_USER_AGENT                   = "AwsSolution/SO0005/v6.3.0"
+        VERSION                                 = "v6.3.0"
+        SOLUTION_ID                             = "SO0005"
       }
       dead_letter_config = {
         target_arn = "arn:${data.aws_partition.current.partition}:sqs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:QuotaMonitor-SNSPublisher-DLQ"
       }
       logging_config = {
-        log_format = "Text"
+        log_format        = "Text"
         retention_in_days = 7
       }
     }
-    
+
     list_manager = {
-      name = "QuotaMonitor-ListManager"
+      name        = "QuotaMonitor-ListManager"
       description = "SO0005 quota-monitor-for-aws - List Manager Function"
-      handler = "index.handler"
-      runtime = "nodejs18.x"
-      timeout = 60
+      handler     = "index.handler"
+      runtime     = "nodejs18.x"
+      timeout     = 60
       memory_size = 128
-      layers = ["utils_sq"]
-      s3_bucket = "solutions-${data.aws_region.current.name}"
-      s3_key = "quota-monitor-for-aws/v6.3.0/assete7a324e67e467d0c22e13b0693ca4efdceb0d53025c7fb45fe524870a5c18046.zip"
+      layers      = ["utils_sq"]
+      s3_bucket   = "solutions-${data.aws_region.current.name}"
+      s3_key      = "quota-monitor-for-aws/v6.3.0/assete7a324e67e467d0c22e13b0693ca4efdceb0d53025c7fb45fe524870a5c18046.zip"
       environment_variables = {
-        LOG_LEVEL = "info"
+        LOG_LEVEL             = "info"
         CUSTOM_SDK_USER_AGENT = "AwsSolution/SO0005/v6.3.0"
-        VERSION = "v6.3.0"
-        SOLUTION_ID = "SO0005"
+        VERSION               = "v6.3.0"
+        SOLUTION_ID           = "SO0005"
       }
       dead_letter_config = {
         target_arn = "arn:${data.aws_partition.current.partition}:sqs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:QuotaMonitor-ListManager-DLQ"
       }
       logging_config = {
-        log_format = "Text"
+        log_format        = "Text"
         retention_in_days = 7
       }
     }
-    
+
     ta_refresher = {
-      name = "QuotaMonitor-TARefresher"
+      name        = "QuotaMonitor-TARefresher"
       description = "SO0005 quota-monitor-for-aws - TA Refresher Function"
-      handler = "index.handler"
-      runtime = "nodejs18.x"
-      timeout = 60
+      handler     = "index.handler"
+      runtime     = "nodejs18.x"
+      timeout     = 60
       memory_size = 128
-      layers = ["utils_ta"]
-      s3_bucket = "solutions-${data.aws_region.current.name}"
-      s3_key = "quota-monitor-for-aws/v6.3.0/assete062344a6a45f8d5d2900b99e0126935391d50d4577da563c08475673a012f4c.zip"
+      layers      = ["utils_ta"]
+      s3_bucket   = "solutions-${data.aws_region.current.name}"
+      s3_key      = "quota-monitor-for-aws/v6.3.0/assete062344a6a45f8d5d2900b99e0126935391d50d4577da563c08475673a012f4c.zip"
       environment_variables = {
-        LOG_LEVEL = "info"
-        AWS_SERVICES = "AutoScaling,CloudFormation,DynamoDB,EBS,EC2,ELB,IAM,Kinesis,RDS,Route53,SES,VPC"
+        LOG_LEVEL             = "info"
+        AWS_SERVICES          = "AutoScaling,CloudFormation,DynamoDB,EBS,EC2,ELB,IAM,Kinesis,RDS,Route53,SES,VPC"
         CUSTOM_SDK_USER_AGENT = "AwsSolution/SO0005/v6.3.0"
-        VERSION = "v6.3.0"
-        SOLUTION_ID = "SO0005"
+        VERSION               = "v6.3.0"
+        SOLUTION_ID           = "SO0005"
       }
       dead_letter_config = {
         target_arn = "arn:${data.aws_partition.current.partition}:sqs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:QuotaMonitor-TARefresher-DLQ"
       }
       logging_config = {
-        log_format = "Text"
+        log_format        = "Text"
         retention_in_days = 7
       }
     }
@@ -489,8 +489,8 @@ module "spoke" {
           Version = "2012-10-17"
           Statement = [
             {
-              Effect = "Allow"
-              Action = "events:PutEvents"
+              Effect   = "Allow"
+              Action   = "events:PutEvents"
               Resource = var.event_bus_arn
             }
           ]
@@ -516,8 +516,8 @@ module "spoke" {
           Version = "2012-10-17"
           Statement = [
             {
-              Effect = "Allow"
-              Action = "events:PutEvents"
+              Effect   = "Allow"
+              Action   = "events:PutEvents"
               Resource = var.event_bus_arn
             }
           ]
@@ -543,8 +543,8 @@ module "spoke" {
           Version = "2012-10-17"
           Statement = [
             {
-              Effect = "Allow"
-              Action = "events:PutEvents"
+              Effect   = "Allow"
+              Action   = "events:PutEvents"
               Resource = var.event_bus_arn
             }
           ]
@@ -570,8 +570,8 @@ module "spoke" {
           Version = "2012-10-17"
           Statement = [
             {
-              Effect = "Allow"
-              Action = "support:RefreshTrustedAdvisorCheck"
+              Effect   = "Allow"
+              Action   = "support:RefreshTrustedAdvisorCheck"
               Resource = "*"
             }
           ]
@@ -582,29 +582,29 @@ module "spoke" {
 
   # App Registry
   app_registry = {
-    enabled = true
-    name = "QM-${data.aws_region.current.name}-${data.aws_caller_identity.current.account_id}"
+    enabled     = true
+    name        = "QM-${data.aws_region.current.name}-${data.aws_caller_identity.current.account_id}"
     description = "Service Catalog application for quota-monitor-for-aws"
     tags = {
       ApplicationType = "AWS-Solutions"
-      SolutionID = "SO0005"
-      SolutionName = "quota-monitor-for-aws"
+      SolutionID      = "SO0005"
+      SolutionName    = "quota-monitor-for-aws"
       SolutionVersion = "v6.3.0"
     }
   }
 
   # App Registry Attribute Group
   app_registry_attribute_group = {
-    name = "quota-monitor-attributes"
+    name        = "quota-monitor-attributes"
     description = "Quota Monitor Attributes"
     attributes = {
-      version = "v6.3.0"
+      version     = "v6.3.0"
       environment = "production"
     }
     tags = {
       ApplicationType = "AWS-Solutions"
-      SolutionID = "SO0005"
-      SolutionName = "quota-monitor-for-aws"
+      SolutionID      = "SO0005"
+      SolutionName    = "quota-monitor-for-aws"
       SolutionVersion = "v6.3.0"
     }
   }
@@ -612,25 +612,25 @@ module "spoke" {
   # Additional Tags
   additional_tags = {
     ApplicationType = "AWS-Solutions"
-    SolutionID = "SO0005"
-    SolutionName = "quota-monitor-for-aws"
+    SolutionID      = "SO0005"
+    SolutionName    = "quota-monitor-for-aws"
     SolutionVersion = "v6.3.0"
   }
 }
 
 # Variables
 variable "event_bus_arn" {
-  type = string
+  type        = string
   description = "Arn for the EventBridge bus in the monitoring account"
-  default = "arn:aws:events:us-east-1:123456789012:event-bus/QuotaMonitorBus"
+  default     = "arn:aws:events:us-east-1:123456789012:event-bus/QuotaMonitorBus"
 }
 
 variable "ta_refresh_rate" {
-  type = string
-  default = "rate(12 hours)"
+  type        = string
+  default     = "rate(12 hours)"
   description = "The rate at which to refresh Trusted Advisor checks"
   validation {
-    condition = contains(["rate(6 hours)", "rate(12 hours)", "rate(1 day)"], var.ta_refresh_rate)
+    condition     = contains(["rate(6 hours)", "rate(12 hours)", "rate(1 day)"], var.ta_refresh_rate)
     error_message = "Refresh rate must be one of: rate(6 hours), rate(12 hours), rate(1 day)"
   }
 }
@@ -643,10 +643,10 @@ data "aws_partition" "current" {}
 # Outputs
 output "service_checks" {
   description = "service limit checks monitored in the account"
-  value = "AutoScaling,CloudFormation,DynamoDB,EBS,EC2,ELB,IAM,Kinesis,RDS,Route53,SES,VPC"
+  value       = "AutoScaling,CloudFormation,DynamoDB,EBS,EC2,ELB,IAM,Kinesis,RDS,Route53,SES,VPC"
 }
 
 output "spoke_sns_event_bus" {
   description = "SNS Event Bus Arn in spoke account"
-  value = module.spoke.eventbridge_bus_arns["sns_spoke"]
+  value       = module.spoke.eventbridge_bus_arns["sns_spoke"]
 }
